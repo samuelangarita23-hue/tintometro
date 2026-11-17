@@ -35,15 +35,48 @@ function igualSeguro(a, b) {
   return x.length === y.length && crypto.timingSafeEqual(x, y);
 }
 
-// ---------- base de datos JSON ----------
+// ---------- base de datos ----------
+// Se guarda en Supabase (Postgres) si están SUPABASE_URL y SUPABASE_KEY; si no, en un archivo JSON.
+// Las ventas simuladas de las cafeterías de ejemplo no se guardan: se vuelven a generar igual al arrancar.
+const SUPA_URL = (process.env.SUPABASE_URL || "").replace(/\/+$/, "");
+const SUPA_KEY = process.env.SUPABASE_KEY || "";
+const SUPA_TABLA = "tintometro_estado";
+const usaSupabase = !!(SUPA_URL && SUPA_KEY);
 let db;
+
+function paraGuardar() {
+  const ventas = {};
+  for (const [id, v] of Object.entries(db.ventas)) {
+    const demo = db.cafeterias[id] && db.cafeterias[id].demo;
+    ventas[id] = demo ? Object.fromEntries(Object.entries(v).filter(([, f]) => f.origen !== "simulado")) : v;
+  }
+  return { ...db, ventas };
+}
+async function supa(ruta, opc = {}) {
+  const r = await fetch(`${SUPA_URL}/rest/v1/${ruta}`, {
+    ...opc, headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, "Content-Type": "application/json", ...(opc.headers || {}) },
+  });
+  if (!r.ok) throw new Error(`Supabase ${r.status}: ${(await r.text()).slice(0, 200)}`);
+  const t = await r.text();
+  return t ? JSON.parse(t) : null;
+}
+let guardando = Promise.resolve();
 function guardar() {
-  const tmp = DB_FILE + ".tmp";
-  fs.writeFileSync(tmp, JSON.stringify(db));
-  fs.renameSync(tmp, DB_FILE);
+  const datos = paraGuardar();
+  if (!usaSupabase) {
+    const tmp = DB_FILE + ".tmp";
+    fs.writeFileSync(tmp, JSON.stringify(datos));
+    fs.renameSync(tmp, DB_FILE);
+    return Promise.resolve();
+  }
+  guardando = guardando.then(() => supa(SUPA_TABLA, {
+    method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+    body: JSON.stringify({ id: "principal", datos, actualizado: new Date().toISOString() }),
+  })).catch((e) => console.error("No se pudo guardar:", e.message));
+  return guardando;
 }
 let pendiente = null;
-const guardarLuego = () => { clearTimeout(pendiente); pendiente = setTimeout(guardar, 300); };
+const guardarLuego = () => { clearTimeout(pendiente); pendiente = setTimeout(guardar, 800); };
 
 function crearDemo() {
   const base = { version: 1, cafeterias: {}, ventas: {}, eventos: {}, cargas: {}, sesiones: {} };
@@ -93,20 +126,31 @@ function extenderDemo() {
   if (cambio) guardarLuego();
 }
 
-function cargarDB() {
+async function leerGuardado() {
+  if (usaSupabase) {
+    const filas = await supa(`${SUPA_TABLA}?id=eq.principal&select=datos`);
+    return filas && filas[0] ? filas[0].datos : null;
+  }
   fs.mkdirSync(DATA_DIR, { recursive: true });
-  if (fs.existsSync(DB_FILE)) db = JSON.parse(fs.readFileSync(DB_FILE, "utf8"));
-  else { db = crearDemo(); guardar(); console.log("Base nueva con las cafeterías de ejemplo"); }
-  // si se agregaron cafeterías de ejemplo nuevas al código, sumarlas a una base que ya existía
-  const faltan = CAFES.filter((c) => !Object.values(db.cafeterias).some((x) => x.demo && x.slug === c.slug));
-  if (faltan.length) {
-    const nuevas = crearDemo();
-    for (const c of Object.values(nuevas.cafeterias)) if (faltan.some((f) => f.slug === c.slug)) {
-      db.cafeterias[c.id] = c; db.ventas[c.id] = nuevas.ventas[c.id]; db.eventos[c.id] = nuevas.eventos[c.id]; db.cargas[c.id] = nuevas.cargas[c.id];
+  return fs.existsSync(DB_FILE) ? JSON.parse(fs.readFileSync(DB_FILE, "utf8")) : null;
+}
+
+async function cargarDB() {
+  const guardado = await leerGuardado();
+  const nuevas = crearDemo();
+  if (!guardado) { db = nuevas; await guardar(); console.log("Base nueva con las cafeterías de ejemplo"); }
+  else {
+    db = guardado;
+    for (const k of ["cafeterias", "ventas", "eventos", "cargas", "sesiones"]) db[k] ||= {};
+    // las cafeterías de ejemplo: se regeneran sus ventas simuladas y se respeta lo que la gente anotó encima
+    for (const nc of Object.values(nuevas.cafeterias)) {
+      const vieja = Object.values(db.cafeterias).find((x) => x.demo && x.slug === nc.slug);
+      if (!vieja) { db.cafeterias[nc.id] = nc; db.ventas[nc.id] = nuevas.ventas[nc.id]; db.eventos[nc.id] = nuevas.eventos[nc.id]; db.cargas[nc.id] = nuevas.cargas[nc.id]; continue; }
+      db.ventas[vieja.id] = { ...nuevas.ventas[nc.id], ...(db.ventas[vieja.id] || {}) };
     }
-    guardar(); console.log("Cafeterías de ejemplo agregadas:", faltan.map((f) => f.slug).join(", "));
   }
   extenderDemo();
+  console.log(`Datos en ${usaSupabase ? "Supabase" : DB_FILE}: ${Object.keys(db.cafeterias).length} cafeterías`);
 }
 
 // ---------- app ----------
@@ -303,6 +347,10 @@ setInterval(() => {
   if (n) guardarLuego();
 }, 3600e3).unref();
 
-cargarDB();
-if (require.main === module) app.listen(PORT, () => console.log(`Tintómetro API en el puerto ${PORT}`));
+if (require.main === module) {
+  cargarDB().then(() => app.listen(PORT, () => console.log(`Tintómetro API en el puerto ${PORT}`)))
+    .catch((e) => { console.error("No se pudo cargar la base:", e.message); process.exit(1); });
+}
+// guarda lo pendiente antes de que Render apague el servidor
+process.on("SIGTERM", async () => { clearTimeout(pendiente); await guardar(); process.exit(0); });
 module.exports = app;

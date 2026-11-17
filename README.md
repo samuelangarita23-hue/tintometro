@@ -31,9 +31,10 @@ render.yaml       Configuración para desplegar el backend en Render
 3. Si la dirección es distinta, cámbiala en `index.html` (busca `CU_API_DEF`) o, sin tocar código,
    abre la página con `?api=https://tu-servicio.onrender.com` una vez: la dirección queda guardada en ese navegador.
 
-**Plan gratis.** `render.yaml` usa el plan gratis, sin disco: la base vive en el servidor mientras está encendido y
-se reinicia cuando Render lo reinicia (por ejemplo, en cada despliegue). Las cafeterías de ejemplo se vuelven a crear solas;
-las cuentas nuevas se pierden. Para guardarlas de verdad, pasa a un plan pago y activa el disco que está comentado en `render.yaml`.
+**Datos guardados (Supabase).** En el plan gratis de Render el disco se borra en cada reinicio, así que el servidor guarda
+su estado en una tabla de Supabase (gratis). Pasos: crear un proyecto en supabase.com, correr `backend/supabase.sql` en el
+SQL Editor y poner en Render (Environment) `SUPABASE_URL` y `SUPABASE_KEY` (la clave *service_role*). Sin esas variables
+guarda en un archivo JSON local, que se pierde al reiniciar.
 
 **Servidor dormido.** En el plan gratis el servicio se duerme tras 15 minutos sin uso y la primera petición tarda
 hasta un minuto. La página muestra "Despertando el servidor…". Antes de una presentación, ábrela unos minutos antes.
