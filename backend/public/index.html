@@ -872,7 +872,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
       <p class="kicker">Proyecto 2 de Álgebra Lineal I, Universidad de La Sabana, 2026-2</p>
       <h1>Demanda de café en una cafetería</h1>
       <p class="lede">Predecimos cuántos cafés se venden en un día a partir del precio, el clima, las promociones y el calendario, con regresión multilineal cuadrática por mínimos cuadrados. Por Samuel Angarita García y Alejandro Serna.</p>
-      <div class="hero-cta"><button class="btn" data-ir="herr">Analizar las ventas de mi cafetería</button><a class="btn ghost" href="#s9" data-ir="acad">Ver la validación</a><button class="btn ghost" id="btnPresentar">▶ Presentar</button></div>
+      <div class="hero-cta"><button class="btn" data-ir="herr">Analizar las ventas de mi cafetería</button><a class="btn ghost" href="#s9" data-ir="acad">Ver la validación</a></div>
     </div>
     <figure class="vivo eqcard" id="vivo">
       <div class="vivo-t">Juega con el modelo: arma un día y mira cuántos cafés se venden</div>
@@ -1381,8 +1381,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   <a href="#e1">Historia</a><a href="#s1">1 Contexto</a><a href="#s2">2 Datos</a><a href="#s3">3 Modelos</a><a href="#s4">4 Matrices</a>
   <a href="#s5">5 Paso a paso</a><a href="#s6">6 Gráficas</a><a href="#s7">7 Métricas</a>
   <a href="#s8">8 Escenarios</a><a href="#s9">9 Validación</a><a href="#s10">10 Autores e IA</a>
-  <button class="nav-guion" id="btnGuion" aria-pressed="false" title="Mostrar qué decir en cada sección">🎤 Guion</button>
-  <button class="nav-pres" id="btnPresentar2" title="Mostrar una sección a la vez, en grande">▶ Presentar</button>
 </div></nav>
 
 <main class="wrap" id="tabAcad" role="tabpanel" aria-labelledby="tabBtnAcad">
@@ -1519,7 +1517,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   <h2><span class="n">1</span>Contexto y pregunta</h2>
   <p class="sub">Qué problema resolvemos y con qué alcance.</p>
   <div class="simple"><span class="simple-t">💡 En palabras simples</span>Queremos predecir cuántos cafés vende la cafetería en un día. La pregunta clave: cuando sube el precio, ¿las ventas bajan en línea recta o en curva?</div>
-  <div class="guion-b"><span class="guion-t">🎤 Qué decir</span><ul><li>El problema es planear la compra: si sabemos cuántos cafés se venden, no sobra ni falta leche ni café.</li><li>Usamos seis datos de cada día: precio, temperatura, lluvia, promoción, gente que pasa y si es viernes.</li><li>Sospechamos que las ventas no bajan en línea recta con el precio, por eso agregamos p².</li></ul><span class="guion-t">👆 Qué mostrar</span><p>Volver a la portada, mover el precio y señalar la suma de barras: «cada barra es β por el dato del día».</p></div>
   <div class="grid2">
     <div>
       <p>La cafetería quiere saber cuántos cafés venderá en un día según el <b>precio</b>, la <b>temperatura</b>, si <b>llueve</b>, si hay <b>promoción</b>, cuánta <b>gente</b> pasa por el local y si es <b>viernes</b>. Así puede planear la compra de insumos y el personal.</p>
@@ -1537,7 +1534,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   <h2><span class="n">2</span>Datos</h2>
   <p class="sub">221 días hábiles de un año (4 de agosto de 2025 a 17 de julio de 2026), sin festivos ni el cierre de fin de año. Incluye temporada normal y de vacaciones. Puede cargar otro CSV con las columnas: precio_miles, temperatura, lluvia, promo, flujo, viernes, ventas.</p>
   <div class="simple"><span class="simple-t">💡 En palabras simples</span>Cada fila es un día: precio, clima, promoción, gente que pasó y cuántos cafés se vendieron. Con los primeros 166 días el modelo aprende y los últimos 55 se guardan para comprobar si acierta.</div>
-  <div class="guion-b"><span class="guion-t">🎤 Qué decir</span><ul><li>Los datos son simulados con una fórmula conocida; así podemos comprobar si el método la recupera. La guía lo permite (p. 11).</li><li>Separamos días de ajuste y de prueba para medir el error en días que el modelo no vio.</li><li>El precio va en miles de pesos para que la matriz no quede mal condicionada.</li></ul><span class="guion-t">👆 Qué mostrar</span><p>Señalar en la tabla las etiquetas «ajuste» (azul) y «prueba» (naranja).</p></div>
   <div class="grid2">
     <div>
       <div class="scroll"><table id="tablaDatos"></table></div>
@@ -1572,7 +1568,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   <h2><span class="n">3</span>Construir los modelos y resolver</h2>
   <p class="sub">Escoja las columnas de la matriz de diseño de cada modelo. La columna 1 (intercepto) siempre va incluida.</p>
   <div class="simple"><span class="simple-t">💡 En palabras simples</span>Aquí se decide qué columnas lleva la matriz X. El modelo A es la recta (sin p²) y el B es la curva (con p²). Al oprimir «Calcular» se resuelven los dos.</div>
-  <div class="guion-b"><span class="guion-t">🎤 Qué decir</span><ul><li>Cada casilla marcada es una columna de la matriz X.</li><li>La única diferencia entre A y B es la columna p².</li><li>Con el botón «Sobreajustado» se ve que meter más columnas no siempre mejora.</li></ul><span class="guion-t">👆 Qué mostrar</span><p>Oprimir el ejemplo «Sobreajustado» y mostrar en la sección 7 que el error de prueba sube.</p></div>
   <div class="grid2">
     <div class="box"><span class="tag tA">Modelo A</span> <div class="terms" id="termsA"></div>
       <button class="btn ghost" data-preset="A:lineal">Lineal</button>
@@ -1593,7 +1588,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   <h2><span class="n">4</span>Modelo matricial</h2>
   <p class="sub">Matrices construidas con los datos de entrenamiento.</p>
   <div class="simple"><span class="simple-t">💡 En palabras simples</span>Estas son las matrices de verdad: X (un día por fila), XᵀX, Xᵀy y el resultado β. El dibujo 3D muestra por qué funciona: la predicción es la sombra de las ventas sobre el plano que forman las columnas de X.</div>
-  <div class="guion-b"><span class="guion-t">🎤 Qué decir</span><ul><li>X es de 166 × 8, entonces XᵀX es de 8 × 8: depende de las columnas, no de los días.</li><li>Resolvemos XᵀXβ = Xᵀy, las ecuaciones normales.</li><li>En el 3D el error r queda perpendicular al plano; por eso Xᵀr = 0, y de ahí salen las ecuaciones normales.</li></ul><span class="guion-t">👆 Qué mostrar</span><p>En la proyección 3D, usar «Explícamelo paso a paso» y mover y₂.</p></div>
   <div class="row" style="margin-bottom:10px">
     <button class="btn ghost" id="verA">Ver modelo A</button><button class="btn ghost" id="verB">Ver modelo B</button>
     <span id="verCual" class="msg"></span>
@@ -1632,7 +1626,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   <h2><span class="n">5</span>Explicación paso a paso</h2>
   <p class="sub">Lo que hace la plataforma al presionar "Calcular".</p>
   <div class="simple"><span class="simple-t">💡 En palabras simples</span>La receta en orden: armar X, calcular XᵀX y Xᵀy, resolver con eliminación de Gauss, obtener β y medir el error.</div>
-  <div class="guion-b"><span class="guion-t">🎤 Qué decir</span><ul><li>Es lo mismo que hicimos a mano en el caso pequeño, pero con 8 columnas.</li><li>Usamos pivoteo parcial: antes de eliminar se cambia de fila para dividir por el número más grande.</li></ul><span class="guion-t">👆 Qué mostrar</span><p>Leer los pasos en voz alta sin entrar en cada número.</p></div>
   <ol class="steps" id="pasos"></ol>
 </section>
 
@@ -1640,7 +1633,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   <h2><span class="n">6</span>Visualización</h2>
   <p class="sub">Ventas ajustadas a las condiciones del Día 1 del comparador, para ver solo el efecto del precio.</p>
   <div class="simple"><span class="simple-t">💡 En palabras simples</span>La curva verde (con p²) sigue mejor los puntos que la recta gris. En los errores, la recta deja una forma de «U» y la curva no. La superficie 3D muestra precio y temperatura a la vez.</div>
-  <div class="guion-b"><span class="guion-t">🎤 Qué decir</span><ul><li>Si los errores forman una «U», al modelo le falta curvatura.</li><li>Con p² la «U» desaparece: el error queda parejo alrededor de 0.</li><li>La superficie es el mismo modelo con dos variables: precio y temperatura.</li></ul><span class="guion-t">👆 Qué mostrar</span><p>Pasar el mouse sobre la curva y girar la superficie; mover el precio en la portada para que se mueva la bolita.</p></div>
   <div class="grid2">
     <div><h3>Ventas vs. precio</h3><canvas id="cvCurva" height="320"></canvas>
       <div class="legend"><span style="--c:var(--blue)">Entrenamiento</span><span style="--c:var(--orange)">Prueba</span><span style="--c:var(--muted)">Modelo A</span><span style="--c:var(--green)">Modelo B</span></div><details class="leer"><summary>¿Cómo leer esta gráfica?</summary><div>Eje horizontal: precio en miles. Eje vertical: cafés vendidos, ajustados para que todos los días tengan las mismas condiciones del Día 1 (así solo se ve el efecto del precio). Puntos azules: días con los que se ajustó el modelo; naranja: días de prueba que el modelo no vio. La línea gris punteada es la recta (modelo A) y la verde la curva con p² (modelo B). Pasa el mouse sobre un punto o a lo largo de las curvas.</div></details></div>
@@ -1664,7 +1656,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   <h2><span class="n">7</span>Resultados y métricas</h2>
   <p class="sub">RMSE = raíz del error cuadrático medio, en cafés por día. Lo que importa es el error en los días de <b>prueba</b>, que el modelo nunca vio.</p>
   <div class="simple"><span class="simple-t">💡 En palabras simples</span>Con la curva el error típico en días nuevos baja de unos 10,5 a 10,1 cafés. Un modelo con demasiadas columnas se equivoca menos en los días que ya conoce, pero más en los nuevos.</div>
-  <div class="guion-b"><span class="guion-t">🎤 Qué decir</span><ul><li>RMSE es el error típico, en cafés por día.</li><li>Para elegir el modelo importa el error de prueba, no el de entrenamiento.</li><li>El número de condición mide qué tan delicada es la matriz XᵀX.</li></ul><span class="guion-t">👆 Qué mostrar</span><p>Señalar la tabla: entrenamiento contra prueba de cada modelo.</p></div>
   <div class="grid3" id="kpis"></div>
   <div class="tw" style="margin-top:12px"><table id="tablaMetricas"></table></div>
   <div class="box ok" id="lectura" style="margin-top:12px"></div>
@@ -1678,7 +1669,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   <h2><span class="n">8</span>Comparador de escenarios</h2>
   <p class="sub">Dos días hipotéticos. Se ve la predicción de cada modelo y cuánto aporta cada término (β̂ⱼ · xⱼ).</p>
   <div class="simple"><span class="simple-t">💡 En palabras simples</span>Dos días inventados para comparar: cuánto suma o resta cada parte del modelo. También muestra el peligro de predecir con un precio que nunca se probó.</div>
-  <div class="guion-b"><span class="guion-t">🎤 Qué decir</span><ul><li>Cada barra es β por el dato del día, igual que en la portada: ŷ = xᵀβ.</li><li>Con precio de 8 mil la curva vuelve a subir: eso es extrapolar y no es confiable.</li></ul><span class="guion-t">👆 Qué mostrar</span><p>Cargar el ejemplo «Fuera de rango» y explicar por qué no se le puede creer.</p></div>
   <div class="row" style="margin-bottom:10px">
     <button class="btn ghost" data-esc="alta">Ejemplo: alta vs. baja demanda</button>
     <button class="btn ghost" data-esc="promo">Ejemplo: con vs. sin promoción</button>
@@ -1693,7 +1683,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   <h2><span class="n">9</span>Validación independiente</h2>
   <p class="sub">Dos pruebas: un caso pequeño que se resuelve a mano y la comparación con Python (NumPy).</p>
   <div class="simple"><span class="simple-t">💡 En palabras simples</span>Comprobamos que todo está bien de dos formas: un caso pequeño resuelto a mano, que da β = (10, −4, 1), y Python, que da los mismos números que la plataforma.</div>
-  <div class="guion-b"><span class="guion-t">🎤 Qué decir</span><ul><li>El caso a mano usa 4 datos que salen exactamente de y = 10 − 4p + p², por eso los errores dan 0.</li><li>Python resolvió con ecuaciones normales, QR y SVD; las diferencias son menores que 0,0001.</li></ul><span class="guion-t">👆 Qué mostrar</span><p>Recorrer la eliminación de Gauss con «Siguiente paso» y mostrar la hoja hecha a mano.</p></div>
   <div class="ga" id="gaBox">
     <div class="ga-head">
       <h3>Eliminación de Gauss paso a paso</h3>
@@ -1739,7 +1728,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 <section id="s10">
   <h2><span class="n">10</span>Autores y uso de IA</h2>
   <div class="simple"><span class="simple-t">💡 En palabras simples</span>Quiénes hicimos el proyecto y cómo usamos la inteligencia artificial.</div>
-  <div class="guion-b"><span class="guion-t">🎤 Qué decir</span><ul><li>Usamos Claude para programar este HTML.</li><li>Nosotros elegimos el tema, revisamos los resultados e hicimos el caso a mano.</li></ul><span class="guion-t">👆 Qué mostrar</span><p>Cerrar mostrando la pestaña «Para tu cafetería» con el ejemplo.</p></div>
   <div class="grid2">
     <div><p><b>Autores:</b> Samuel Angarita García y Alejandro Serna.<br>Ingeniería Industrial, Universidad de La Sabana, 2026-2.</p>
       <p><b>Funcionamiento:</b> la página es un solo archivo, sin librerías externas. La parte académica funciona sin internet; la pestaña «Para tu cafetería» usa internet solo para traer el clima de Open-Meteo. El álgebra (productos matriciales, eliminación gaussiana y autovalores por Jacobi) está programada a mano en JavaScript.</p></div>
@@ -1754,14 +1742,6 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 </section>
 </main>
 <button class="totop" id="totop" aria-label="Volver arriba">↑</button>
-<div class="pres-bar" id="presBar" hidden>
-  <div class="pres-prog"><i id="presProg"></i></div>
-  <button id="presAnt" aria-label="Anterior">←</button>
-  <span id="presInfo"></span>
-  <button id="presSig" aria-label="Siguiente">→</button>
-  <button id="presGuion" title="Mostrar u ocultar el guion (G)">🎤 Guion</button>
-  <button id="presSalir">Salir (Esc)</button>
-</div>
 <footer><div class="wrap"><span class="pie-marca"><svg class="marca-ico" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"> <path d="M24 17c-3-4 3-6 0-10M34 17c-3-4 3-6 0-10" fill="none" stroke="#5C4A42" stroke-width="3" stroke-linecap="round"/> <path d="M47 29h3.5a7.5 7.5 0 0 1 0 15H46" fill="none" stroke="#6B3E26" stroke-width="4.5" stroke-linecap="round"/> <path d="M10 23h40v13a20 20 0 0 1-40 0z" fill="#6B3E26"/> <path d="M19.5 41a10.5 10.5 0 0 1 21 0" fill="none" stroke="#E8C39E" stroke-width="3" stroke-linecap="round"/> <path d="M30 41l6.5-7.5" stroke="#F5ECE1" stroke-width="3" stroke-linecap="round"/> <circle cx="30" cy="41" r="3" fill="#F5ECE1"/> </svg><b>Tintómetro</b> · Proyecto final de Álgebra Lineal I, Universidad de La Sabana, 2026-2</span><span>Samuel Angarita García y Alejandro Serna · <a href="#tintometro" data-ir="planes">Tintómetro: planes y precios</a></span></div></footer>
 
 <script>
@@ -3051,13 +3031,8 @@ document.getElementById("hEjemplo2").onclick=()=>{ document.getElementById("hEje
   addEventListener("resize",()=>{ if(visible) pintar(); }); window.pintarSuperficie=()=>{ if(window.vivoX){ const X=vivoX(); est.L=X.L; est.Pr=X.Pr; est.V=X.V; } if(visible) pintar(); }; pintarSuperficie(); pintar();
 })();
 
-// ---------- guion, preguntas y diccionario ----------
+// ---------- preguntas y diccionario ----------
 (function(){
-  const b=document.getElementById("btnGuion"), pb=document.getElementById("presGuion");
-  const poner=on=>{ document.body.classList.toggle("guion",on); b.setAttribute("aria-pressed",on); try{ localStorage.setItem("guion",on?"1":"0"); }catch(e){} };
-  try{ if(localStorage.getItem("guion")==="1") poner(true); }catch(e){}
-  b.onclick=()=>poner(!document.body.classList.contains("guion")); pb.onclick=b.onclick;
-  addEventListener("keydown",e=>{ if((e.key==="g"||e.key==="G") && !e.target.closest("input,select,textarea")) b.onclick(); });
   document.querySelectorAll(".check").forEach(c=>{ const ok=+c.dataset.ok, r=c.querySelector(".check-r");
     c.querySelectorAll(".check-b").forEach(bt=>bt.onclick=()=>{ const i=+bt.dataset.i;
       if(i===ok){ c.querySelectorAll(".check-b").forEach(x=>x.disabled=true); bt.classList.add("si"); r.innerHTML=`<b>¡Correcto!</b> ${r.dataset.ex}`; }
@@ -3322,40 +3297,6 @@ const heroAnim=(function(){
   addEventListener("resize",pintar); window.pintarProyeccion=pintar; pintar();
 })();
 
-// ---------- modo presentación ----------
-(function(){
-  const bar=document.getElementById("presBar"); let slides=[], i=0;
-  const nombre=s=>{ if(s.id==="portada") return "Portada"; if(s.dataset.n) return s.dataset.n; const h=s.querySelector("h2"); return h?h.textContent.replace(/^\d+/,"").trim():""; };
-  function mostrar(n){
-    i=Math.max(0,Math.min(slides.length-1,n));
-    slides.forEach((s,k)=>s.classList.toggle("pv",k===i)); if(slides[i].classList.contains("escena")){ slides[i].classList.add("vis"); if(slides[i].id==="e2" && window.prepararHistoria) prepararHistoria(); }
-    document.getElementById("presInfo").textContent=`${i+1} / ${slides.length} · ${nombre(slides[i])}`;
-    document.getElementById("presProg").style.width=((i+1)/slides.length*100)+"%";
-    scrollTo({top:0,behavior:"instant"});
-    requestAnimationFrame(()=>{ try{ renderGraficas(); }catch(e){} if(window.pintarProyeccion) pintarProyeccion(); if(window.pintarSuperficie) pintarSuperficie(); });
-  }
-  function entrar(){
-    abrirTab("acad"); slides=[...document.querySelectorAll("#tabAcad>section")];
-    document.body.classList.add("present"); bar.hidden=false; mostrar(0);
-    if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
-  }
-  function salir(){
-    document.body.classList.remove("present"); bar.hidden=true; slides.forEach(s=>s.classList.remove("pv"));
-    if(document.fullscreenElement) document.exitFullscreen().catch(()=>{});
-    requestAnimationFrame(()=>{ try{ renderGraficas(); }catch(e){} if(window.pintarProyeccion) pintarProyeccion(); });
-  }
-  document.getElementById("btnPresentar").onclick=entrar; document.getElementById("btnPresentar2").onclick=entrar;
-  document.getElementById("presSig").onclick=()=>mostrar(i+1); document.getElementById("presAnt").onclick=()=>mostrar(i-1);
-  document.getElementById("presSalir").onclick=salir;
-  addEventListener("keydown",e=>{ if(!document.body.classList.contains("present")) return;
-    if(e.target.closest && e.target.closest("input,select,textarea,#gaBox")) { if(e.key==="Escape") salir(); return; }
-    if(["ArrowRight","PageDown"," "].includes(e.key)){ mostrar(i+1); e.preventDefault(); }
-    else if(["ArrowLeft","PageUp"].includes(e.key)){ mostrar(i-1); e.preventDefault(); }
-    else if(e.key==="Escape") salir(); });
-  let fsActivo=false;
-  document.addEventListener("fullscreenchange",()=>{ if(document.fullscreenElement){ fsActivo=true; return; }
-    if(fsActivo && document.body.classList.contains("present")) salir(); fsActivo=false; });
-})();
 
 // ---------- herramienta: resumen, reto y aparición ----------
 function pintarStory(){
