@@ -1,12 +1,12 @@
 // Rachas y resumen de una cafetería a partir de sus ventas.
-const { diaNum, isoDe, diaSemana } = require("./demo");
+const { diaNum, isoDe, diaSemana, FESTIVOS } = require("./demo");
 
 // días abiertos hacia atrás desde "desde" (incluido)
-function* abiertosHaciaAtras(desde, abiertos, limite = 800) {
+function* abiertosHaciaAtras(desde, abiertos, limite = 800, cerrados = []) {
   let n = diaNum(desde);
   for (let i = 0; i < limite; i++, n--) {
     const iso = isoDe(n);
-    if (abiertos.includes(diaSemana(iso))) yield iso;
+    if (abiertos.includes(diaSemana(iso)) && !cerrados.includes(iso)) yield iso;
   }
 }
 
@@ -32,23 +32,24 @@ function calcularResumen(cafe, ventas, hoy) {
   const ayer = isoDe(diaNum(hoy) - 1);
   const hoyAnotado = !!ventas[hoy];
   const meta = +cafe.meta || 0;
+  const cerrados = cafe.cierraFestivos ? FESTIVOS : [];
 
   // 1) días seguidos anotando ventas (si hoy aún no anota, la racha sigue viva desde ayer)
   let registro = 0;
-  for (const iso of abiertosHaciaAtras(hoyAnotado ? hoy : ayer, abiertos)) {
+  for (const iso of abiertosHaciaAtras(hoyAnotado ? hoy : ayer, abiertos, 800, cerrados)) {
     if (iso < fechas[0]) break;
     if (ventas[iso]) registro++; else break;
   }
   // 2) días seguidos cumpliendo la meta (mismo punto de partida)
   let metaAct = 0;
-  if (meta > 0) for (const iso of abiertosHaciaAtras(hoyAnotado ? hoy : ayer, abiertos)) {
+  if (meta > 0) for (const iso of abiertosHaciaAtras(hoyAnotado ? hoy : ayer, abiertos, 800, cerrados)) {
     if (iso < fechas[0]) break;
     if (ventas[iso] && ventas[iso].ventas >= meta) metaAct++; else break;
   }
   // récords sobre toda la historia (solo días abiertos)
   const todosAbiertos = [];
   for (let n = diaNum(fechas[0]); n <= diaNum(hoy); n++) {
-    const iso = isoDe(n); if (abiertos.includes(diaSemana(iso))) todosAbiertos.push(iso);
+    const iso = isoDe(n); if (abiertos.includes(diaSemana(iso)) && !cerrados.includes(iso)) todosAbiertos.push(iso);
   }
   const recReg = rachaMasLarga(todosAbiertos, (i) => !!ventas[i]);
   const recMeta = meta > 0 ? rachaMasLarga(todosAbiertos, (i) => ventas[i] && ventas[i].ventas >= meta) : 0;

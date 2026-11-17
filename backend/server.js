@@ -53,7 +53,7 @@ function crearDemo() {
     const { sal, hash } = hashClave("cafe2026");
     base.cafeterias[id] = {
       id, slug: c.slug, nombre: c.nombre, ciudad: c.ciudad, producto: c.producto, meta: c.meta,
-      diasAbiertos: c.diasAbiertos, correo: c.correo, sal, hash, demo: true, creada: c.desde,
+      diasAbiertos: c.diasAbiertos, cierraFestivos: !!c.cierraFestivos, correo: c.correo, sal, hash, demo: true, creada: c.desde,
     };
     base.ventas[id] = {};
     for (let n = diaNum(c.desde); n <= diaNum(ayer); n++) {
@@ -97,6 +97,15 @@ function cargarDB() {
   fs.mkdirSync(DATA_DIR, { recursive: true });
   if (fs.existsSync(DB_FILE)) db = JSON.parse(fs.readFileSync(DB_FILE, "utf8"));
   else { db = crearDemo(); guardar(); console.log("Base nueva con las cafeterías de ejemplo"); }
+  // si se agregaron cafeterías de ejemplo nuevas al código, sumarlas a una base que ya existía
+  const faltan = CAFES.filter((c) => !Object.values(db.cafeterias).some((x) => x.demo && x.slug === c.slug));
+  if (faltan.length) {
+    const nuevas = crearDemo();
+    for (const c of Object.values(nuevas.cafeterias)) if (faltan.some((f) => f.slug === c.slug)) {
+      db.cafeterias[c.id] = c; db.ventas[c.id] = nuevas.ventas[c.id]; db.eventos[c.id] = nuevas.eventos[c.id]; db.cargas[c.id] = nuevas.cargas[c.id];
+    }
+    guardar(); console.log("Cafeterías de ejemplo agregadas:", faltan.map((f) => f.slug).join(", "));
+  }
   extenderDemo();
 }
 

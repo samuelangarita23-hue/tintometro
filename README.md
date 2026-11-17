@@ -55,8 +55,12 @@ Servida desde `localhost`, la página usa automáticamente la API local.
 |---|---|---|---|---|---|
 | Café La Esquina | Chía | tinto | 100 | lunes a sábado | 17 nov 2025 |
 | Tinto & Pan | Zipaquirá | café con leche | 85 | todos los días | 2 mar 2026 |
+| Granos del Parque | Bogotá | capuchino | 120 | lunes a viernes (cierra festivos) | 13 ene 2026 |
+| La Tostadora | Chía | café de origen | 70 | miércoles a domingo | 3 jun 2026 |
+| Montaña Fría | Tunja | tinto | 110 | lunes a sábado | 1 dic 2025 |
+| Café Laureles | Medellín | café helado | 95 | todos los días | 6 abr 2026 |
 
-Se entra con un clic en la página (sin contraseña), o con `demo@laesquina.co` / `demo@tintoypan.co` y la contraseña `cafe2026`.
+Se entra con un clic en la página (sin contraseña), o con su correo `demo@…` y la contraseña `cafe2026`.
 Sus ventas son simuladas con una fórmula conocida (precio, precio², temperatura, lluvia, promoción, día de la semana,
 festivos y vacaciones). Cada día el servidor agrega solo las ventas de ayer, así sus rachas siguen vivas.
 También traen los festivos de Colombia, eventos propios en el calendario y un historial de archivos subidos.

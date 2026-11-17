@@ -39,12 +39,12 @@ function esVacaciones(iso) {
 }
 
 // clima de la Sabana, el mismo para las dos (cambia la semilla por ciudad)
-function clima(iso, semilla) {
+function clima(iso, semilla, tBase = 14.3) {
   const r = rng(diaNum(iso) * 7919 + semilla);
   const mes = +iso.slice(5, 7);
   const lluvioso = [4, 5, 10, 11].includes(mes) ? 0.62 : [3, 9, 12].includes(mes) ? 0.42 : 0.28;
   const lluvia = r() < lluvioso ? 1 : 0;
-  const T = Math.round((14.3 + 1.4 * normal(r) - 1.1 * lluvia) * 10) / 10;
+  const T = Math.round((tBase + 1.4 * normal(r) - 1.1 * lluvia) * 10) / 10;
   return { temperatura: T, lluvia };
 }
 
@@ -92,6 +92,65 @@ const CAFES = [
     },
     promo: (iso, r) => ((diaSemana(iso) === 3) ? r() < 0.6 : r() < 0.15),
   },
+  {
+    slug: "granos-del-parque", nombre: "Granos del Parque", ciudad: "Bogotá", producto: "capuchino",
+    meta: 120, diasAbiertos: [1, 2, 3, 4, 5], desde: "2026-01-13", semilla: 303, tBase: 14.0, cierraFestivos: true,
+    correo: "demo@granosdelparque.co",
+    faltas: ["2026-02-20", "2026-04-28", "2026-07-03", "2026-09-11"],
+    precio(iso, r) { const base = iso < "2026-08-01" ? 6000 : 6500; return base + (r() < 0.2 ? (r() < 0.5 ? -800 : 500) : 0); },
+    ventas(iso, d, c, r) { // zona de oficinas: lunes y viernes flojos, vacaciones muy flojas
+      const p = d.precio / 1000, ds = diaSemana(iso);
+      let y = 330 - 52 * p + 3 * p * p - 3 * (c.temperatura - 14) + 16 * c.lluvia + 25 * (d.promo ? 1 : 0);
+      if (ds === 1) y -= 15; if (ds === 5) y -= 22; if (ds === 3) y += 10;
+      if (d.tipo === "Vacaciones") y -= 45;
+      return Math.max(20, Math.round(y + 10 * normal(r)));
+    },
+    promo: (iso, r) => (diaSemana(iso) === 4 ? r() < 0.5 : r() < 0.1),
+  },
+  {
+    slug: "la-tostadora", nombre: "La Tostadora", ciudad: "Chía", producto: "café de origen",
+    meta: 70, diasAbiertos: [3, 4, 5, 6, 0], desde: "2026-06-03", semilla: 404, tBase: 14.3,
+    correo: "demo@latostadora.co",
+    faltas: ["2026-07-26", "2026-09-06", "2026-10-25"],
+    precio(iso, r) { return 7000 + (r() < 0.25 ? (r() < 0.5 ? -1000 : 1000) : 0); },
+    ventas(iso, d, c, r) { // tienda de especialidad: fin de semana fuerte y creciendo
+      const p = d.precio / 1000, ds = diaSemana(iso), meses = (diaNum(iso) - diaNum("2026-06-03")) / 30;
+      let y = 120 - 14 * p + 0.6 * p * p - 2 * (c.temperatura - 14) + 6 * c.lluvia + 15 * (d.promo ? 1 : 0) + 4 * meses;
+      if (ds === 6) y += 28; if (ds === 0) y += 34;
+      if (d.tipo === "Festivo") y += 20;
+      return Math.max(8, Math.round(y + 7 * normal(r)));
+    },
+    promo: (iso, r) => r() < 0.12,
+  },
+  {
+    slug: "montana-fria", nombre: "Montaña Fría", ciudad: "Tunja", producto: "tinto",
+    meta: 110, diasAbiertos: [1, 2, 3, 4, 5, 6], desde: "2025-12-01", semilla: 505, tBase: 12.8,
+    correo: "demo@montanafria.co",
+    faltas: ["2025-12-24", "2025-12-31", "2026-03-14", "2026-06-27", "2026-08-22", "2026-11-07"],
+    precio(iso, r) { return (iso < "2026-05-01" ? 2200 : 2500) + (r() < 0.2 ? 300 : 0); },
+    ventas(iso, d, c, r) { // ciudad fría: el frío y la lluvia pesan mucho
+      const p = d.precio / 1000, ds = diaSemana(iso);
+      let y = 230 - 60 * p + 5 * p * p - 7 * (c.temperatura - 13) + 26 * c.lluvia + 20 * (d.promo ? 1 : 0);
+      if (ds === 6) y += 12; if (d.tipo === "Festivo") y -= 20; if (d.tipo === "Vacaciones") y -= 18;
+      return Math.max(15, Math.round(y + 9 * normal(r)));
+    },
+    promo: (iso, r) => r() < 0.2,
+  },
+  {
+    slug: "cafe-laureles", nombre: "Café Laureles", ciudad: "Medellín", producto: "café helado",
+    meta: 95, diasAbiertos: [0, 1, 2, 3, 4, 5, 6], desde: "2026-04-06", semilla: 606, tBase: 23.5,
+    correo: "demo@cafelaureles.co",
+    faltas: ["2026-05-10", "2026-08-09", "2026-10-18"],
+    precio(iso, r) { return 9000 + (r() < 0.3 ? (r() < 0.5 ? -1500 : 1000) : 0); },
+    ventas(iso, d, c, r) { // en Medellín el calor SUBE las ventas de café helado
+      const p = d.precio / 1000, ds = diaSemana(iso);
+      let y = 150 - 9 * p + 0.3 * p * p + 6 * (c.temperatura - 23) - 18 * c.lluvia + 18 * (d.promo ? 1 : 0);
+      if (ds === 0 || ds === 6) y += 22; if (d.tipo === "Festivo") y += 18;
+      if (iso >= "2026-08-01" && iso <= "2026-08-12") y += 30; // Feria de las Flores
+      return Math.max(10, Math.round(y + 7 * normal(r)));
+    },
+    promo: (iso, r) => (diaSemana(iso) === 2 ? r() < 0.6 : r() < 0.1),
+  },
 ];
 
 function tipoDia(iso) {
@@ -104,8 +163,9 @@ function tipoDia(iso) {
 function filaDemo(cafe, iso) {
   if (!cafe.diasAbiertos.includes(diaSemana(iso))) return null;
   if (cafe.faltas.includes(iso)) return null;
+  if (cafe.cierraFestivos && FESTIVOS.includes(iso)) return null;
   const r = rng(diaNum(iso) * 104729 + cafe.semilla);
-  const c = clima(iso, cafe.semilla);
+  const c = clima(iso, cafe.semilla, cafe.tBase);
   const d = { precio: cafe.precio(iso, r), promo: cafe.promo(iso, r), tipo: tipoDia(iso) };
   return {
     precio: d.precio, ventas: cafe.ventas(iso, d, c, r), promo: d.promo, tipo: d.tipo,
@@ -117,6 +177,32 @@ function eventosDemo(cafe) {
   const ev = FESTIVOS.filter((f) => f >= cafe.desde).map((f) => ({
     fecha: f, tipo: "festivo", titulo: FESTIVO_NOMBRE[f.slice(5)] || "Festivo",
   }));
+  const extra = {
+    "granos-del-parque": [
+      { fecha: "2026-01-13", tipo: "nota", titulo: "Abrimos frente al parque de la 93" },
+      { fecha: "2026-08-01", tipo: "nota", titulo: "Capuchino a $6.500" },
+      { fecha: "2026-11-19", tipo: "promocion", titulo: "Jueves de capuchino + croissant" },
+      { fecha: "2026-12-11", tipo: "evento", titulo: "Fiesta de fin de año de las oficinas" },
+    ],
+    "la-tostadora": [
+      { fecha: "2026-06-03", tipo: "nota", titulo: "Inauguración" },
+      { fecha: "2026-09-12", tipo: "evento", titulo: "Cata de cafés de Huila" },
+      { fecha: "2026-11-21", tipo: "evento", titulo: "Mercado campesino en la plaza" },
+      { fecha: "2026-11-28", tipo: "promocion", titulo: "Black Friday: 2x1 en bolsas de café" },
+    ],
+    "montana-fria": [
+      { fecha: "2026-05-01", tipo: "nota", titulo: "Tinto a $2.500" },
+      { fecha: "2026-10-15", tipo: "evento", titulo: "Festival de la Ruana" },
+      { fecha: "2026-12-04", tipo: "evento", titulo: "Aguinaldo boyacense" },
+    ],
+    "cafe-laureles": [
+      { fecha: "2026-04-06", tipo: "nota", titulo: "Abrimos en Laureles" },
+      { fecha: "2026-08-01", tipo: "evento", titulo: "Feria de las Flores" },
+      { fecha: "2026-11-24", tipo: "promocion", titulo: "Martes de café helado a mitad de precio" },
+      { fecha: "2026-12-01", tipo: "evento", titulo: "Alborada y alumbrados" },
+    ],
+  }[cafe.slug];
+  if (extra) return [...ev, ...extra];
   const propios = cafe.slug === "cafe-la-esquina" ? [
     { fecha: "2026-02-01", tipo: "nota", titulo: "Subimos el tinto a $2.800" },
     { fecha: "2026-06-01", tipo: "nota", titulo: "Nueva carta: tinto a $3.000" },
@@ -138,4 +224,4 @@ function eventosDemo(cafe) {
   return [...ev, ...propios];
 }
 
-module.exports = { CAFES, filaDemo, eventosDemo, diaNum, isoDe, diaSemana };
+module.exports = { CAFES, FESTIVOS, filaDemo, eventosDemo, diaNum, isoDe, diaSemana };
