@@ -3513,11 +3513,12 @@ renderTerms(); cargar(CSV_ORIGINAL,true); prepararHistoria();
 
 // ---------- cuenta Tintómetro (conexión con el servidor) ----------
 (function(){
-  const CU_API_DEF = "https://api.tintometro.cafe", CU_API_RESPALDO = "https://tintometro-api.onrender.com";
-  const enLocal = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  const CU_API_DEF = "https://tintometro.cafe", CU_API_RESPALDO = "https://tintometro-api.onrender.com";
+  // si la página la sirve el mismo servidor (tintometro.cafe, onrender o localhost:3000), la API está en el mismo sitio
+  const mismoSitio = /^https?:$/.test(location.protocol) && !/github\.io$/.test(location.hostname) && location.port!=="8080";
   const qApi = new URLSearchParams(location.search).get("api");
   if(qApi) guardarLS("tintometro_api", qApi);
-  let API = (leerLS("tintometro_api") || (enLocal ? "http://localhost:3000" : CU_API_DEF)).replace(/\/+$/,"");
+  let API = (leerLS("tintometro_api") || (mismoSitio ? location.origin : location.port==="8080" ? "http://localhost:3000" : CU_API_DEF)).replace(/\/+$/,"");
   const DIAS_L = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
   const S = { token: leerLS("tintometro_token"), cafe:null, resumen:null, hoy:null, ventas:{}, eventos:[], mes:null, sel:null, archivo:null };
   const el = id => document.getElementById(id);

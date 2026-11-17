@@ -153,7 +153,9 @@ function limpiarFila(f) {
 }
 
 // ---------- rutas ----------
-app.get("/", (req, res) => res.json({ ok: true, servicio: "Tintómetro API", hoy: hoyBogota() }));
+// la página: tintometro.cafe la sirve este mismo servidor
+const PUBLICO = path.join(__dirname, "public");
+app.use(express.static(PUBLICO, { maxAge: "5m", extensions: ["html"] }));
 app.get("/api/salud", (req, res) => res.json({ ok: true, hoy: hoyBogota() }));
 
 // cafeterías de ejemplo (sin contraseña, como una vitrina)
@@ -280,6 +282,8 @@ app.post("/api/admin/reiniciar-demo", (req, res) => {
   db = nuevas; guardar(); res.json({ ok: true });
 });
 
+app.use("/api", (req, res) => res.status(404).json({ error: "Ruta no encontrada." }));
+app.get("*", (req, res) => res.sendFile(path.join(PUBLICO, "index.html")));
 app.use((req, res) => res.status(404).json({ error: "Ruta no encontrada." }));
 app.use((err, req, res, next) => { console.error(err); res.status(500).json({ error: "Algo falló en el servidor." }); });
 

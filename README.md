@@ -3,10 +3,12 @@
 Predice cuántos cafés vende una cafetería y le dice qué mueve sus ventas, con regresión multilineal cuadrática por mínimos cuadrados.
 Proyecto de Álgebra Lineal I · Universidad de La Sabana · Samuel Angarita García y Alejandro Serna.
 
-En línea: **https://tintometro.cafe** · API: **https://api.tintometro.cafe** (respaldo: https://tintometro-api.onrender.com)
+En línea: **https://tintometro.cafe**. Todo lo sirve el servidor de Render: la página (`backend/public/index.html`) y la API (`/api/...`).
+Respaldo: https://tintometro-api.onrender.com. La copia en GitHub Pages (`index.html` en la raíz) usa esa misma API.
 
 ```
-index.html        La página (GitHub Pages): parte académica, herramienta para cafeterías y planes
+index.html        Copia de la página para GitHub Pages
+backend/public/   La página que sirve Render en tintometro.cafe
 backend/          API en Node/Express con base de datos JSON
   server.js       Rutas: cuentas, ventas, rachas, calendario, historial de cargas
   demo.js         Las dos cafeterías de ejemplo (datos simulados)
