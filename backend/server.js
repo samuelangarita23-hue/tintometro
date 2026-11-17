@@ -11,8 +11,10 @@ const { CAFES, filaDemo, eventosDemo, diaNum, isoDe } = require("./demo");
 const { calcularResumen } = require("./rachas");
 
 const PORT = process.env.PORT || 3000;
-const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
-const DB_FILE = path.join(DATA_DIR, "db.json");
+// Siempre en una carpeta propia: si el disco lo comparte otro servicio (Tapin), no se tocan sus archivos.
+const DATA_DIR = process.env.TINTOMETRO_DATA_DIR
+  || (process.env.DATA_DIR ? path.join(process.env.DATA_DIR, "tintometro") : path.join(__dirname, "data"));
+const DB_FILE = path.join(DATA_DIR, "tintometro_db.json");
 const ADMIN_KEY = process.env.ADMIN_KEY || "";
 const ZONA = "America/Bogota";
 
