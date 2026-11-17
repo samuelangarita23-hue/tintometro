@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: tintometro-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/salud
+    envVars:
+      - key: ADMIN_KEY
+        generateValue: true
+    # Para que las cuentas no se borren al reiniciar (plan pago): quita "plan: free"
+    # y descomenta estas líneas.
+    # disk:
+    #   name: tintometro-datos
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    # y agrega en envVars:  - key: DATA_DIR  /  value: /var/data
