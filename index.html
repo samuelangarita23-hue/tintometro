@@ -3513,7 +3513,7 @@ renderTerms(); cargar(CSV_ORIGINAL,true); prepararHistoria();
 
 // ---------- cuenta Tintómetro (conexión con el servidor) ----------
 (function(){
-  const CU_API_DEF = "https://tintometro-api.onrender.com";
+  const CU_API_DEF = "https://api.tintometro.cafe", CU_API_RESPALDO = "https://tintometro-api.onrender.com";
   const enLocal = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   const qApi = new URLSearchParams(location.search).get("api");
   if(qApi) guardarLS("tintometro_api", qApi);
@@ -3534,6 +3534,7 @@ renderTerms(); cargar(CSV_ORIGINAL,true); prepararHistoria();
       if(!r.ok){ if(r.status===401 && S.token && ruta!=="/api/entrar") cerrarLocal(); throw new Error((datos&&datos.error)||"El servidor respondió con un error."); }
       if(avisado) msg("",false,S.cafe?"cuMsg2":"cuMsg"); return datos;
     }catch(e){
+      if(e instanceof TypeError && API===CU_API_DEF && !leerLS("tintometro_api")){ API=CU_API_RESPALDO; el("cuApi").value=API; return api(ruta,opc); }
       if(e.name==="AbortError"||e instanceof TypeError) throw new Error(`No pude conectar con el servidor (${API}). Revisa tu internet o la dirección del servidor.`);
       throw e;
     }finally{ clearTimeout(aviso); clearTimeout(corte); }
