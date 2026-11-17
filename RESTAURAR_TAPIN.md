@@ -13,12 +13,14 @@ Configuración original de Tapin (16 nov 2026):
 | Build Command | `npm install` |
 | Start Command | `npm start` |
 | Disco | `/var/data`, 1 GB |
-| Variable agregada para Tintómetro | `TINTOMETRO_DATA_DIR=/var/data/tintometro` |
+| Dominios de Tapin | `tapincol.com`, `www.tapincol.com` (Render: `tapin-backend-zz1o.onrender.com`) |
+| Variables de entorno | No se tocaron. Tintómetro usa `DATA_DIR` de Tapin + `/tintometro` |
 
 Para devolverlo:
-1. Settings → Build → Source → volver a `tapin-backend`, rama `main`.
-2. Settings → Root Directory → dejarlo vacío.
-3. Environment → borrar `TINTOMETRO_DATA_DIR`.
-4. Custom Domains → quitar `tintometro.cafe` y `www.tintometro.cafe` (deja `tapin.page`).
-5. Manual Deploy → Deploy latest commit. Revisar que tapin.page y `/demo` respondan.
-6. (Opcional) Los datos de Tintómetro quedan en `/var/data/tintometro/`; se pueden copiar antes de borrarlos.
+1. Settings → Build → Source → **Edit** → `tapin-backend`, rama `main`.
+2. En esa misma ventana: Build Command `npm install` y Start Command `npm start` (para Tintómetro se pusieron `cd backend && npm install` y `cd backend && npm start`).
+3. Custom Domains → quitar `tintometro.cafe` y `www.tintometro.cafe` (dejar `tapincol.com` y `www.tapincol.com`).
+4. Manual Deploy → Deploy latest commit. Revisar que tapincol.com y `/demo` respondan.
+5. (Opcional) Los datos de Tintómetro quedan en `/var/data/tintometro/`; se pueden copiar antes de borrarlos.
+
+6. Si Tintómetro se vuelve a pasar a otro servicio, en Spaceship cambiar el CNAME `www` de `tintometro.cafe` (hoy apunta a `tapin-backend-zz1o.onrender.com`).
