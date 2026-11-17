@@ -184,6 +184,11 @@ function auth(req, res, next) {
   if (!req.cafe) return res.status(401).json({ error: "La cuenta ya no existe." });
   req.token = token; next();
 }
+// las cafeterías de ejemplo son solo para mirar
+function noDemo(req, res, next) {
+  if (req.cafe.demo) return res.status(403).json({ error: "Las cafeterías de ejemplo son solo para mirar. Crea tu cuenta para anotar tus propias ventas." });
+  next();
+}
 function publico(c) {
   const { sal, hash, ...resto } = c; return resto;
 }
@@ -250,7 +255,7 @@ app.post("/api/entrar", limitarIntentos, (req, res) => {
 app.post("/api/salir", auth, (req, res) => { delete db.sesiones[req.token]; guardarLuego(); res.json({ ok: true }); });
 
 app.get("/api/yo", auth, (req, res) => res.json(paraCliente(req.cafe)));
-app.put("/api/yo", auth, (req, res) => {
+app.put("/api/yo", auth, noDemo, (req, res) => {
   const c = req.cafe, b = req.body || {};
   if (b.nombre !== undefined && String(b.nombre).trim()) c.nombre = String(b.nombre).trim().slice(0, 40);
   if (b.ciudad !== undefined) c.ciudad = String(b.ciudad).slice(0, 40);
@@ -269,18 +274,18 @@ app.get("/api/ventas", auth, (req, res) => {
   const filas = Object.keys(v).sort().filter((f) => (!desde || f >= desde) && (!hasta || f <= hasta)).map((f) => ({ fecha: f, ...v[f] }));
   res.json(filas);
 });
-app.post("/api/ventas", auth, (req, res) => {
+app.post("/api/ventas", auth, noDemo, (req, res) => {
   const x = limpiarFila(req.body);
   if (!x) return res.status(400).json({ error: "Revisa la fecha, el precio y las ventas." });
   if (x[0] > hoyBogota()) return res.status(400).json({ error: "No puedes anotar ventas de un día que no ha pasado." });
   (db.ventas[req.cafe.id] ||= {})[x[0]] = x[1];
   guardarLuego(); res.json(paraCliente(req.cafe));
 });
-app.delete("/api/ventas/:fecha", auth, (req, res) => {
+app.delete("/api/ventas/:fecha", auth, noDemo, (req, res) => {
   delete (db.ventas[req.cafe.id] || {})[req.params.fecha];
   guardarLuego(); res.json(paraCliente(req.cafe));
 });
-app.post("/api/ventas/importar", auth, (req, res) => {
+app.post("/api/ventas/importar", auth, noDemo, (req, res) => {
   const filas = Array.isArray(req.body?.filas) ? req.body.filas : [];
   if (!filas.length || filas.length > 5000) return res.status(400).json({ error: "No llegaron filas para guardar (máximo 5.000)." });
   const v = (db.ventas[req.cafe.id] ||= {}), hoy = hoyBogota();
@@ -313,14 +318,14 @@ app.get("/api/eventos", auth, (req, res) => {
   const mes = String(req.query.mes || "");
   res.json((db.eventos[req.cafe.id] || []).filter((e) => !mes || e.fecha.startsWith(mes)).sort((a, b) => a.fecha.localeCompare(b.fecha)));
 });
-app.post("/api/eventos", auth, (req, res) => {
+app.post("/api/eventos", auth, noDemo, (req, res) => {
   const { fecha, tipo, titulo } = req.body || {};
   if (!esFecha(fecha) || !String(titulo || "").trim()) return res.status(400).json({ error: "El evento necesita fecha y nombre." });
   const e = { id: nuevoId(5), fecha, tipo: TIPOS_EVENTO.includes(tipo) ? tipo : "nota", titulo: String(titulo).trim().slice(0, 80) };
   (db.eventos[req.cafe.id] ||= []).push(e);
   guardarLuego(); res.status(201).json(e);
 });
-app.delete("/api/eventos/:id", auth, (req, res) => {
+app.delete("/api/eventos/:id", auth, noDemo, (req, res) => {
   db.eventos[req.cafe.id] = (db.eventos[req.cafe.id] || []).filter((e) => e.id !== req.params.id);
   guardarLuego(); res.json({ ok: true });
 });

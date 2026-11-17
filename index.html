@@ -817,6 +817,8 @@ body.present .escena{margin:0;width:auto;border-radius:18px;min-height:calc(100v
 }
 .cu-nuevo-ev input,.cu-nuevo-ev select{font:400 .9rem var(--sans);color:var(--ink);padding:7px 9px;border:1px solid #D9CDC5;border-radius:8px;background:#fff}
 .cu-nuevo-ev input:focus,.cu-nuevo-ev select:focus{border-color:var(--ember);outline:none;box-shadow:0 0 0 3px rgba(194,124,62,.15)}
+.cu-solo{margin-bottom:14px;background:#FFF8F0;border-color:#E3C29F;font-size:.92rem}
+.cu-link{border:0;background:none;padding:0;color:var(--roast);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
 
 #tabPlanes section{background:transparent;border:0;border-radius:0;margin:0;padding:0;box-shadow:none}
 #tabPlanes h2{display:block;color:inherit}
@@ -1150,6 +1152,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
       <button class="btn ghost" id="cuSalir" type="button">Salir</button>
     </div>
 
+    <div class="box cu-solo" id="cuSoloVer" hidden>👀 Esta es una cafetería de ejemplo: puedes mirar todo, pero no editar. Para anotar tus propias ventas, <button type="button" class="cu-link" id="cuIrCrear">crea tu cuenta</button>.</div>
     <form id="cuEditar" class="cu-editar" hidden novalidate>
       <label class="field">Nombre<input id="cuENombre" maxlength="40"></label>
       <label class="field">Ciudad<select id="cuECiudad"></select></label>
@@ -3545,6 +3548,9 @@ renderTerms(); cargar(CSV_ORIGINAL,true); prepararHistoria();
     const abre=(c.diasAbiertos||[]).length===7?"abre todos los días":"abre "+(c.diasAbiertos||[]).map(i=>DIAS_L[i].slice(0,3)).join(", ");
     el("cuDetalle").textContent=`${c.ciudad} · ${c.producto} · meta ${c.meta||"sin definir"} al día · ${abre}`;
     el("cuDemoTag").hidden=!c.demo;
+    const soloVer=!!c.demo; S.soloVer=soloVer;
+    el("cuSoloVer").hidden=!soloVer; el("cuEditarBtn").hidden=soloVer; el("cuAnotar").hidden=soloVer;
+    if(soloVer){ el("cuEditar").hidden=true; el("cuGuardarBox").hidden=true; el("cuGuardarAqui")?.remove(); }
     pintarRachas(); pintarSemanas();
   }
 
@@ -3553,7 +3559,7 @@ renderTerms(); cargar(CSV_ORIGINAL,true); prepararHistoria();
     const card=(ico,n,l,rec,viva,extra="")=>`<div class="racha${viva?" viva":""}"><div class="racha-ico" aria-hidden="true">${ico}</div><div><div class="racha-n">${n}</div><div class="racha-l">${l}</div><div class="racha-r">Récord: ${rec}${extra}</div></div></div>`;
     const reg=r.registro, me=r.meta, se=r.semanas;
     el("cuRachas").innerHTML=
-      card("🔥",reg.actual,reg.actual===1?"día anotando ventas":"días seguidos anotando ventas",reg.record, reg.actual>0, reg.hoyAnotado?" · hoy ya anotaste ✓":" · anota hoy para no perderla")
+      card("🔥",reg.actual,reg.actual===1?"día anotando ventas":"días seguidos anotando ventas",reg.record, reg.actual>0, S.soloVer?"":reg.hoyAnotado?" · hoy ya anotaste ✓":" · anota hoy para no perderla")
       + card("🎯",me.actual, me.valor?(me.actual===1?`día vendiendo ${me.valor}+ ${p}`:`días seguidos vendiendo ${me.valor}+ ${p}`):"define una meta en tu perfil",me.record, me.actual>0)
       + card("📈",se.actual,se.actual===1?"semana vendiendo más que la anterior":"semanas seguidas vendiendo más",se.record, se.actual>0);
   }
@@ -3590,12 +3596,12 @@ renderTerms(); cargar(CSV_ORIGINAL,true); prepararHistoria();
     let h=`<h3>${fechaLarga(f)}</h3>`;
     if(v) h+=`<div class="cu-dia-v"><div><b>${v.ventas}</b><span>${producto()}${meta?(v.ventas>=meta?" · meta cumplida ✓":` · ${meta-v.ventas} para la meta`):""}</span></div><div><b>${pesos(v.precio)}</b><span>precio</span></div><div><b>${v.promo?"Sí":"No"}</b><span>promoción</span></div>${v.temperatura!=null?`<div><b>${fmt(v.temperatura,1)} °C</b><span>${v.lluvia?"llovió":"sin lluvia"}</span></div>`:""}</div>`;
     else h+=`<p class="msg">${f>S.hoy?"Todavía no llega este día.":"No hay ventas anotadas este día."}</p>`;
-    h+=`<ul class="cu-evs">${evs.map(e=>`<li><span class="tag ${esc(e.tipo)}">${nombreTipo[e.tipo]||"Nota"}</span>${esc(e.titulo)}<button type="button" data-borrar="${esc(e.id)}" aria-label="Borrar ${esc(e.titulo)}">×</button></li>`).join("")}</ul>`;
-    h+=`<form class="cu-nuevo-ev" id="cuNuevoEv"><select id="cuEvTipo" aria-label="Tipo de evento"><option value="promocion">Promoción</option><option value="evento">Evento</option><option value="festivo">Festivo</option><option value="nota">Nota</option></select><input id="cuEvTit" maxlength="80" placeholder="Agregar al calendario…" aria-label="Nombre del evento"><button class="btn ghost" type="submit">Agregar</button></form>`;
+    h+=`<ul class="cu-evs">${evs.map(e=>`<li><span class="tag ${esc(e.tipo)}">${nombreTipo[e.tipo]||"Nota"}</span>${esc(e.titulo)}${S.soloVer?"":`<button type="button" data-borrar="${esc(e.id)}" aria-label="Borrar ${esc(e.titulo)}">×</button>`}</li>`).join("")}</ul>`;
+    if(!S.soloVer) h+=`<form class="cu-nuevo-ev" id="cuNuevoEv"><select id="cuEvTipo" aria-label="Tipo de evento"><option value="promocion">Promoción</option><option value="evento">Evento</option><option value="festivo">Festivo</option><option value="nota">Nota</option></select><input id="cuEvTit" maxlength="80" placeholder="Agregar al calendario…" aria-label="Nombre del evento"><button class="btn ghost" type="submit">Agregar</button></form>`;
     el("cuDia").innerHTML=h;
     el("cuDia").querySelectorAll("[data-borrar]").forEach(b=>b.onclick=async()=>{
       try{ await api("/api/eventos/"+b.dataset.borrar,{method:"DELETE"}); S.eventos=S.eventos.filter(e=>e.id!==b.dataset.borrar); pintarDia(f); }catch(e){ msg(e.message,true,"cuMsg2"); } });
-    el("cuNuevoEv").onsubmit=async ev=>{ ev.preventDefault(); const t=el("cuEvTit").value.trim(); if(!t){ el("cuEvTit").focus(); return; }
+    if(el("cuNuevoEv")) el("cuNuevoEv").onsubmit=async ev=>{ ev.preventDefault(); const t=el("cuEvTit").value.trim(); if(!t){ el("cuEvTit").focus(); return; }
       try{ S.eventos.push(await api("/api/eventos",{method:"POST",body:JSON.stringify({fecha:f,tipo:el("cuEvTipo").value,titulo:t})})); pintarDia(f); }catch(e){ msg(e.message,true,"cuMsg2"); } };
     // formulario para anotar ese día (o hoy si el día es futuro)
     const fa = f>S.hoy ? S.hoy : f, va=S.ventas[fa], ult=S.ventas[S.ultimoDia()];
@@ -3652,7 +3658,7 @@ renderTerms(); cargar(CSV_ORIGINAL,true); prepararHistoria();
   cargarArchivo = async function(file){
     const antes=H.todas;
     await cargarOriginal(file);
-    if(!S.cafe || !H.todas.length || H.todas===antes) return;
+    if(!S.cafe || S.soloVer || !H.todas.length || H.todas===antes) return;
     S.archivo=file.name;
     const dias=new Set(H.todas.map(r=>iso(r.f))).size;
     el("cuGuardarTxt").textContent=`Subiste ${file.name} (${dias} días). ¿Lo guardo en tu cuenta para sumar a tus rachas y tu calendario?`;
@@ -3673,6 +3679,8 @@ renderTerms(); cargar(CSV_ORIGINAL,true); prepararHistoria();
       msg(`Guardado: ${d.carga.nuevas} días nuevos y ${d.carga.actualizadas} actualizados${d.malas?` (${d.malas} filas no se pudieron leer)`:""}.`,false,"cuMsg2");
       hMensaje(`✓ Guardado en tu cuenta: ${d.carga.nuevas} días nuevos y ${d.carga.actualizadas} actualizados.`); }
     catch(e){ msg(e.message,true,"cuMsg2"); } };
+
+  el("cuIrCrear").onclick=async()=>{ try{ await api("/api/salir",{method:"POST"}); }catch(e){} cerrarLocal(); cargarDemos(); el("cuRNombre").focus(); el("cuRegistro").scrollIntoView({block:"center"}); };
 
   // arranque
   window.cuentaActiva = () => !!S.token;
