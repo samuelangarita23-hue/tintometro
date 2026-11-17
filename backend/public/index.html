@@ -3657,6 +3657,10 @@ renderTerms(); cargar(CSV_ORIGINAL,true); prepararHistoria();
     const dias=new Set(H.todas.map(r=>iso(r.f))).size;
     el("cuGuardarTxt").textContent=`Subiste ${file.name} (${dias} días). ¿Lo guardo en tu cuenta para sumar a tus rachas y tu calendario?`;
     el("cuGuardarBox").hidden=false;
+    // también justo debajo de donde subió el archivo
+    const m=$h("hMsg"); el("cuGuardarAqui")?.remove();
+    m.insertAdjacentHTML("afterend",`<div class="box cu-guardar" id="cuGuardarAqui" style="margin-top:10px"><span>¿Guardo <b>${esc(file.name)}</b> (${dias} días) en la cuenta de <b>${esc(S.cafe.nombre)}</b>? Así suma a tus rachas y a tu calendario.</span><button class="btn" type="button" id="cuGuardarBtn2">Guardar en mi cuenta</button></div>`);
+    el("cuGuardarBtn2").onclick=()=>el("cuGuardarBtn").onclick();
   };
   el("cuGuardarBtn").onclick=async()=>{
     const m=new Map();
@@ -3665,8 +3669,9 @@ renderTerms(); cargar(CSV_ORIGINAL,true); prepararHistoria();
     const filas=[...m.values()].map(a=>({fecha:a.fecha,precio:Math.round(a.precio/a.n),ventas:Math.round(a.ventas),promo:a.promo,tipo:a.tipo,temperatura:a.temperatura,lluvia:a.lluvia}));
     try{ const d=await api("/api/ventas/importar",{method:"POST",body:JSON.stringify({archivo:S.archivo,filas})});
       aplicar(d); const v=await api("/api/ventas"); S.ventas=Object.fromEntries(v.map(x=>[x.fecha,x]));
-      el("cuGuardarBox").hidden=true; pintarCalendario(); pintarCargas();
-      msg(`Guardado: ${d.carga.nuevas} días nuevos y ${d.carga.actualizadas} actualizados${d.malas?` (${d.malas} filas no se pudieron leer)`:""}.`,false,"cuMsg2"); }
+      el("cuGuardarBox").hidden=true; el("cuGuardarAqui")?.remove(); pintarCalendario(); pintarCargas();
+      msg(`Guardado: ${d.carga.nuevas} días nuevos y ${d.carga.actualizadas} actualizados${d.malas?` (${d.malas} filas no se pudieron leer)`:""}.`,false,"cuMsg2");
+      hMensaje(`✓ Guardado en tu cuenta: ${d.carga.nuevas} días nuevos y ${d.carga.actualizadas} actualizados.`); }
     catch(e){ msg(e.message,true,"cuMsg2"); } };
 
   // arranque
