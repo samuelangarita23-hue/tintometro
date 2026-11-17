@@ -503,8 +503,8 @@ body.present .escena{margin:0;width:auto;border-radius:18px;min-height:calc(100v
 .fu-cond{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
 .fu-cond span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.84rem}
 .fu-wf{display:flex;flex-direction:column;gap:4px}
-.fu-r{display:grid;grid-template-columns:170px minmax(0,1fr) 58px;gap:8px;align-items:center;font-size:.8rem}
-.fu-r .fl{font-family:var(--mono);color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fu-r{display:grid;grid-template-columns:minmax(120px,190px) minmax(0,1fr) 48px;gap:8px;align-items:center;font-size:.8rem}
+.fu-r .fl{color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fu-r .fv{font:700 .8rem var(--mono);text-align:right}
 .fu-t{position:relative;height:13px}.fu-t::before{content:"";position:absolute;left:var(--z);top:-2px;bottom:-2px;border-left:1px dashed #CDBFB6}
 .fu-b{position:absolute;top:0;height:100%;border-radius:3px}.fu-b.pos{background:#2F9E5B}.fu-b.neg{background:var(--red)}.fu-b.tot{background:var(--ember)}
@@ -2547,7 +2547,7 @@ function predecirDia(){
   $h("hFechaTxt").textContent = r.f.toLocaleDateString("es-CO",{timeZone:"UTC",weekday:"long",day:"numeric",month:"long"});
   animarNumero($h("hVentas"), H.ultimaY, y, v=>fmt(v,0)); H.ultimaY=y; pintarTazas(y);
   $h("hRango").textContent = `Lo normal es que el valor real quede entre ${fmt(Math.max(0,y-M.margen),0)} y ${fmt(y+M.margen,0)}.`;
-  $h("hIngresos").textContent = pesos(y*r.p*1000);
+  $h("hIngresos").textContent = pesos(Math.round(y*r.p*1000/100)*100);
   $h("hIngTxt").textContent = `${fmt(y,0)} ${producto()} × ${pesos(r.p*1000)}`;
   const av=[], dow=r.f.getUTCDay();
   if((dow===0||dow===6) && !H.filas.some(x=>[0,6].includes(x.f.getUTCDay()))) av.push("Tus datos no tienen sábados ni domingos: el cálculo para un fin de semana no es confiable.");
@@ -2709,9 +2709,10 @@ function pintarDashboard(){
     const sx=i=>m.l+i/Math.max(n-1,1)*(w-m.l-m.r), sy=v=>h-m.b-v/ymax*(h-m.t-m.b);
     g.font="12px 'Instrument Sans', system-ui, sans-serif";
     for(const v of ticksBonitos(0,ymax,5)){ g.strokeStyle="#EFE8E3"; g.beginPath(); g.moveTo(m.l,sy(v)); g.lineTo(w-m.r,sy(v)); g.stroke(); g.fillStyle="#7A6A62"; g.textAlign="right"; g.fillText(fmt(v,0),m.l-6,sy(v)+4); }
-    let mesAnt=-1; g.textAlign="left"; g.fillStyle="#7A6A62";
+    let mesAnt=-1, xAnt=-99; g.textAlign="left"; g.fillStyle="#7A6A62";
     R.forEach((r,i)=>{ const mes=r.f.getUTCMonth(); if(mes!==mesAnt){ g.strokeStyle="#E3D9D2"; g.beginPath(); g.moveTo(sx(i),m.t); g.lineTo(sx(i),h-m.b); g.stroke();
-      if(sx(i)<w-40) g.fillText(r.f.toLocaleDateString("es-CO",{timeZone:"UTC",month:"short"}),sx(i)+3,h-m.b+18); mesAnt=mes; } });
+      const et=r.f.toLocaleDateString("es-CO",{timeZone:"UTC",month:"short"}).replace(".",""), ancho=g.measureText(et).width+8;
+      if(sx(i)<w-40 && sx(i)-xAnt>=ancho){ g.fillText(et,sx(i)+3,h-m.b+18); xAnt=sx(i); } mesAnt=mes; } });
     g.strokeStyle="rgba(107,62,38,.75)"; g.lineWidth=1.4; g.beginPath(); R.forEach((r,i)=>i?g.lineTo(sx(i),sy(r.y)):g.moveTo(sx(i),sy(r.y))); g.stroke();
     g.strokeStyle="#9C8B82"; g.lineWidth=2.6; g.beginPath(); R.forEach((r,i)=>{ const a=R.slice(Math.max(0,i-6),i+1), v=a.reduce((s,x)=>s+x.y,0)/a.length; i?g.lineTo(sx(i),sy(v)):g.moveTo(sx(i),sy(v)); }); g.stroke();
     g.fillStyle=css("--ember"); R.forEach((r,i)=>{ if(r.promo===1){ g.beginPath(); g.arc(sx(i),sy(r.y),2.8,0,7); g.fill(); } }); H.serieGeo={l:m.l,r:m.r,w,n,sy}; }
@@ -3133,13 +3134,25 @@ function pintarFuturo(){
   if(H.cats.length) cond.push(`📌 ${c.tipo}${c.n&&c.tipo!==H.base?` (lo más común en ${mesN})`:""}`);
   $h("hFuCond").innerHTML=cond.map(x=>`<span>${x}</span>`).join("");
   // barras xᵀβ
-  const vals=M.cols.map((cc,j)=>({n:cc.lab, x:cc.f(r), b:M.beta[j], v:M.beta[j]*cc.f(r)}));
+  const nombre=(cc,x)=>{ const k=cc.k;
+    if(k==="1") return "Base";
+    if(k==="p"||k==="p2") return `Precio ${pesos(r.p*1000)}`;
+    if(k==="T") return `Temperatura ${fmt(r.T,1)} °C`;
+    if(k==="L") return `Lluvia (${fmt(r.L*100,0)} % de probabilidad)`;
+    if(k==="promo") return "Promoción";
+    if(k==="vie") return "Viernes";
+    if(k.startsWith("tipo:")) return `Día ${cc.lab.toLowerCase()}`;
+    return cc.lab.charAt(0).toUpperCase()+cc.lab.slice(1); };
+  const grupos=new Map();
+  M.cols.forEach((cc,j)=>{ const x=cc.f(r), v=M.beta[j]*x, n=nombre(cc,x), g=grupos.get(n)||{n,v:0,det:[]};
+    g.v+=v; g.det.push(`${fmt(M.beta[j],2)} × ${fmt(x,2)}`); grupos.set(n,g); });
+  const vals=[...grupos.values()].filter(g=>Math.abs(g.v)>=0.05);
   let acc=0; const pts=[0]; vals.forEach(v=>{ acc+=v.v; pts.push(acc); });
-  const lo=Math.min(...pts), hi=Math.max(...pts,1), pos=v=>(v-lo)/(hi-lo)*100, f2=v=>(v<0?"−":"+")+fmt(Math.abs(v),1);
+  const lo=Math.min(...pts), hi=Math.max(...pts,1), pos=v=>(v-lo)/(hi-lo)*100, f2=v=>(v<0?"−":"+")+fmt(Math.abs(v),0);
   let h=""; acc=0;
   vals.forEach(v=>{ const a0=acc; acc+=v.v; const l=Math.min(pos(a0),pos(acc)), w=Math.abs(pos(acc)-pos(a0));
-    h+=`<div class="fu-r" title="${fmt(v.b,2)} × ${fmt(v.x,2)}"><span class="fl">${v.n} ${fmt(v.b,1)}×${fmt(v.x,v.x%1?2:0)}</span><span class="fu-t" style="--z:${pos(0)}%"><i class="fu-b ${v.v>=0?"pos":"neg"}" style="left:${l}%;width:${Math.max(w,.5)}%"></i></span><span class="fv">${f2(v.v)}</span></div>`; });
-  h+=`<div class="fu-r tot"><span class="fl">= ŷ</span><span class="fu-t" style="--z:${pos(0)}%"><i class="fu-b tot" style="left:${pos(0)}%;width:${Math.max(0,pos(acc)-pos(0))}%"></i></span><span class="fv">${fmt(acc,1)}</span></div>`;
+    h+=`<div class="fu-r" title="β × dato: ${v.det.join(" + ")}"><span class="fl">${v.n}</span><span class="fu-t" style="--z:${pos(0)}%"><i class="fu-b ${v.v>=0?"pos":"neg"}" style="left:${l}%;width:${Math.max(w,.5)}%"></i></span><span class="fv">${f2(v.v)}</span></div>`; });
+  h+=`<div class="fu-r tot"><span class="fl">= Ventas esperadas</span><span class="fu-t" style="--z:${pos(0)}%"><i class="fu-b tot" style="left:${pos(0)}%;width:${Math.max(0,pos(acc)-pos(0))}%"></i></span><span class="fv">${fmt(acc,0)}</span></div>`;
   $h("hFuWf").innerHTML=h;
   const av=[], ult=H.filas[H.filas.length-1].f, dias=Math.round((f-ult)/864e5), dow=f.getUTCDay();
   if(dias>60) av.push(`Tus datos llegan hasta el ${ult.toLocaleDateString("es-CO",{timeZone:"UTC",day:"numeric",month:"long",year:"numeric"})}. Para una fecha tan lejana el cálculo supone que tu cafetería sigue igual (mismos clientes y costumbres).`);
@@ -3178,7 +3191,10 @@ function prepararMeses(){
   const nom=m=>{ const [a,b]=m.split("-").map(Number); return new Date(Date.UTC(a,b-1,1)).toLocaleDateString("es-CO",{timeZone:"UTC",month:"long",year:"numeric"}); };
   const op=meses.map(m=>`<option value="${m}">${nom(m)}</option>`).join("");
   if(meses.length<2){ $h("hCmp").hidden=true; return; } $h("hCmp").hidden=false;
-  $h("hMesA").innerHTML=op; $h("hMesB").innerHTML=op; $h("hMesA").value=meses[meses.length-2]; $h("hMesB").value=meses[meses.length-1];
+  $h("hMesA").innerHTML=op; $h("hMesB").innerHTML=op;
+  // si el último mes va por la mitad, se comparan los dos últimos meses completos
+  const ultDia=+iso(R[R.length-1].f).slice(8), k=(ultDia<25 && meses.length>=3)?meses.length-2:meses.length-1;
+  $h("hMesA").value=meses[k-1]; $h("hMesB").value=meses[k];
   pintarMeses();
 }
 function pintarMeses(){
